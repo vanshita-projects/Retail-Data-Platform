@@ -1,0 +1,12 @@
+psycopg[binary]
+pymongo
+pandas
+requests
+paramiko
+boto3
+python-dotenv
+PyYAML
+SQLAlchemy
+pytest
+dbt-snowflake
+great-expectations

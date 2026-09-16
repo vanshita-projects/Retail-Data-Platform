@@ -6,33 +6,32 @@ and Airflow orchestration.
 
 ## Architecture
 
-PostgreSQL / MongoDB / CSV / SFTP / REST API
-        ↓
-Python Extraction Framework
-        ↓
-MinIO / S3 Raw Landing
-        ↓
-Snowflake RAW
-        ↓
-dbt Staging
-        ↓
-dbt Intermediate
-        ↓
-dbt Gold / Marts
-        ↓
-Data Quality
-        ↓
-Analytics-ready Data
+```mermaid
+flowchart TD
+    A[PostgreSQL] --> F[Python Extraction Framework]
+    B[MongoDB] --> F
+    C[CSV Files] --> F
+    D[SFTP] --> F
+    E[REST APIs] --> F
+
+    F --> G[MinIO / S3 Raw Landing]
+    G --> H[Snowflake RAW]
+    H --> I[dbt Staging]
+    I --> J[dbt Intermediate]
+    J --> K[dbt Gold / Marts]
+    K --> L[Data Quality]
+    L --> M[Analytics-ready Data]
+```
 
 ## Technologies
 
-- Python
-- PostgreSQL
-- MongoDB
-- Docker
-- MinIO
-- Snowflake
-- dbt
-- Great Expectations
-- Apache Airflow
-- Git / GitHub
+* Python
+* PostgreSQL
+* MongoDB
+* Docker
+* MinIO
+* Snowflake
+* dbt
+* Great Expectations
+* Apache Airflow
+* Git / GitHub

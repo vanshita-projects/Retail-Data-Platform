@@ -1,26 +1,43 @@
-PostgreSQL
-├── Incremental → watermark + updated_at
-└── Append-only → new transaction rows
+## Ingestion Patterns
 
-MongoDB
-├── Incremental → timestamp filtering
-└── Append-only → event timestamp
+### PostgreSQL
 
-CSV
-├── Full File Load
-└── Incremental File Load
+- **Incremental**
+  - Watermark-based extraction
+  - `updated_at` filtering
+- **Append-only**
+  - Extract newly created transaction rows
 
-REST APIs
-└── Incremental API
-    ├── date/timestamp parameters
-    ├── pagination
-    ├── retries
-    └── rate limiting
+### MongoDB
 
-SFTP
-├── Full File Load
-└── Incremental File Load
-    ├── file date
-    ├── file hash
-    ├── duplicate detection
-    └── quarantine
+- **Incremental**
+  - Timestamp-based filtering
+- **Append-only**
+  - Event timestamp
+  - JSON document extraction
+
+### CSV Files
+
+- **Full File Load**
+  - Process the complete file
+- **Incremental File Load**
+  - Process newly received or changed files
+  - Track file metadata
+
+### REST APIs
+
+- **Incremental API**
+  - Date/timestamp parameters
+  - Pagination
+  - Retry handling
+  - Rate limiting
+
+### SFTP
+
+- **Full File Load**
+  - Discover and process the required files
+- **Incremental File Load**
+  - File date
+  - File hash
+  - Duplicate detection
+  - Quarantine invalid files

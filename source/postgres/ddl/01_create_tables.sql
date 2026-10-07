@@ -1,11 +1,13 @@
 -- ============================================================
 -- Retail Data Platform
--- Order Management - PostgreSQL Source System
+-- PostgreSQL Source System
+-- Order Management
 -- ============================================================
 
 -- ============================================================
--- 1. customers
--- Incremental extraction using updated_at
+-- 1. CUSTOMERS
+-- Customer master data
+-- Incremental extraction: updated_at
 -- ============================================================
 
 CREATE TABLE customers (
@@ -21,8 +23,9 @@ CREATE TABLE customers (
 
 
 -- ============================================================
--- 2. customer_addresses
--- Incremental extraction using updated_at
+-- 2. CUSTOMER_ADDRESSES
+-- Customer address records
+-- Incremental extraction: updated_at
 -- ============================================================
 
 CREATE TABLE customer_addresses (
@@ -45,8 +48,9 @@ CREATE TABLE customer_addresses (
 
 
 -- ============================================================
--- 3. orders
--- Incremental extraction using updated_at
+-- 3. ORDERS
+-- Order header / transaction data
+-- Incremental extraction: updated_at
 -- ============================================================
 
 CREATE TABLE orders (
@@ -61,13 +65,17 @@ CREATE TABLE orders (
 
     CONSTRAINT fk_orders_customer
         FOREIGN KEY (customer_id)
-        REFERENCES customers(customer_id)
+        REFERENCES customers(customer_id),
+
+    CONSTRAINT chk_orders_total_amount
+        CHECK (total_amount >= 0)
 );
 
 
 -- ============================================================
--- 4. order_items
--- Append-only transaction table
+-- 4. ORDER_ITEMS
+-- Products and quantities within an order
+-- Append-only extraction: created_at
 -- ============================================================
 
 CREATE TABLE order_items (
@@ -92,13 +100,17 @@ CREATE TABLE order_items (
         CHECK (unit_price >= 0),
 
     CONSTRAINT chk_order_items_discount
-        CHECK (discount_amount >= 0)
+        CHECK (discount_amount >= 0),
+
+    CONSTRAINT chk_order_items_line_amount
+        CHECK (line_amount >= 0)
 );
 
 
 -- ============================================================
--- 5. payments
--- Incremental extraction using updated_at
+-- 5. PAYMENTS
+-- Payment transactions
+-- Incremental extraction: updated_at
 -- ============================================================
 
 CREATE TABLE payments (
@@ -122,8 +134,9 @@ CREATE TABLE payments (
 
 
 -- ============================================================
--- 6. returns
--- Incremental extraction using updated_at
+-- 6. RETURNS
+-- Returned order items
+-- Incremental extraction: updated_at
 -- ============================================================
 
 CREATE TABLE returns (
@@ -152,3 +165,46 @@ CREATE TABLE returns (
     CONSTRAINT chk_returns_refund
         CHECK (refund_amount >= 0)
 );
+
+
+-- ============================================================
+-- INDEXES
+-- Support incremental extraction and common relationships
+-- ============================================================
+
+CREATE INDEX idx_customers_updated_at
+    ON customers(updated_at);
+
+CREATE INDEX idx_customer_addresses_customer_id
+    ON customer_addresses(customer_id);
+
+CREATE INDEX idx_customer_addresses_updated_at
+    ON customer_addresses(updated_at);
+
+CREATE INDEX idx_orders_customer_id
+    ON orders(customer_id);
+
+CREATE INDEX idx_orders_updated_at
+    ON orders(updated_at);
+
+CREATE INDEX idx_order_items_order_id
+    ON order_items(order_id);
+
+CREATE INDEX idx_order_items_created_at
+    ON order_items(created_at);
+
+CREATE INDEX idx_payments_order_id
+    ON payments(order_id);
+
+CREATE INDEX idx_payments_updated_at
+    ON payments(updated_at);
+
+CREATE INDEX idx_returns_order_id
+    ON returns(order_id);
+
+CREATE INDEX idx_returns_order_item_id
+    ON returns(order_item_id);
+
+CREATE INDEX idx_returns_updated_at
+    ON returns(updated_at);
+
